@@ -1,0 +1,43 @@
+'-> Nested loop inner join  (cost=312402 rows=15178)
+    -> Filter: (e.birth_date between ''1960-01-01'' and ''1969-12-31'')  (cost=32169 rows=32699)
+        -> Table scan on e  (cost=32169 rows=294316)
+    -> Filter: ((s.to_date is null) and (s.salary_amount > (select #2)))  (cost=7.63 rows=0.464)
+        -> Index lookup on s using idx_employee_id (employee_id=e.id)  (cost=7.63 rows=9.36)
+        -> Select #2 (subquery in condition; run only once)
+            -> Aggregate: avg(salary.salary_amount)  (cost=322846 rows=1)
+                -> Filter: (salary.to_date is null)  (cost=294595 rows=282503)
+                    -> Table scan on salary  (cost=294595 rows=2.83e+6)
+'
+
+'-> Nested loop inner join  (cost=359869 rows=70028)
+    -> Filter: ((s.to_date is null) and (s.salary_amount > (select #2)))  (cost=296653 rows=140056)
+        -> Table scan on s  (cost=296653 rows=2.83e+6)
+        -> Select #2 (subquery in condition; run only once)
+            -> Aggregate: avg(salary.salary_amount)  (cost=324903 rows=1)
+                -> Filter: (salary.to_date is null)  (cost=296653 rows=282503)
+                    -> Table scan on salary  (cost=296653 rows=2.83e+6)
+    -> Filter: (e.birth_date between ''1960-01-01'' and ''1969-12-31'')  (cost=0.351 rows=0.5)
+        -> Single-row index lookup on e using PRIMARY (id=s.employee_id)  (cost=0.351 rows=1)
+'
+
+'-> Nested loop inner join  (cost=447872 rows=70028) (actual time=13.3..4112 rows=42086 loops=1)
+    -> Filter: ((s.to_date is null) and (s.salary_amount > (select #2)))  (cost=293848 rows=140056) (actual time=0.0604..3265 rows=107706 loops=1)
+        -> Table scan on s  (cost=293848 rows=2.83e+6) (actual time=0.0537..3133 rows=2.84e+6 loops=1)
+        -> Select #2 (subquery in condition; run only once)
+            -> Aggregate: avg(salary.salary_amount)  (cost=322099 rows=1) (actual time=3128..3128 rows=1 loops=1)
+                -> Filter: (salary.to_date is null)  (cost=293848 rows=282503) (actual time=1.01..3109 rows=240124 loops=1)
+                    -> Table scan on salary  (cost=293848 rows=2.83e+6) (actual time=1.01..3027 rows=2.84e+6 loops=1)
+    -> Filter: (e.birth_date between ''1960-01-01'' and ''1969-12-31'')  (cost=1 rows=0.5) (actual time=0.00774..0.00777 rows=0.391 loops=107706)
+        -> Single-row index lookup on e using PRIMARY (id=s.employee_id)  (cost=1 rows=1) (actual time=0.00732..0.00734 rows=1 loops=107706)
+'
+
+'-> Nested loop inner join  (cost=1.27e+6 rows=46472) (actual time=2966..7411 rows=42086 loops=1)
+    -> Filter: (e.birth_date between ''1960-01-01'' and ''1969-12-31'')  (cost=31851 rows=147158) (actual time=16.6..711 rows=117138 loops=1)
+        -> Table scan on e  (cost=31851 rows=294316) (actual time=16.6..625 rows=300024 loops=1)
+    -> Filter: (s.salary_amount > (select #2))  (cost=7.49 rows=0.316) (actual time=0.0567..0.0571 rows=0.359 loops=117138)
+        -> Index lookup on s using ak_salary (employee_id=e.id), with index condition: (s.to_date is null)  (cost=7.49 rows=9.47) (actual time=0.0313..0.0319 rows=0.8 loops=117138)
+        -> Select #2 (subquery in condition; run only once)
+            -> Aggregate: avg(salary.salary_amount)  (cost=322476 rows=1) (actual time=2928..2928 rows=1 loops=1)
+                -> Filter: (salary.to_date is null)  (cost=294225 rows=282503) (actual time=0.998..2908 rows=240124 loops=1)
+                    -> Table scan on salary  (cost=294225 rows=2.83e+6) (actual time=0.995..2826 rows=2.84e+6 loops=1)
+'
