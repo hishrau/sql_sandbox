@@ -48,16 +48,59 @@ SELECT date(time) from courier_actions limit 100;
 SELECT strftime('%Y');
 SELECT strftime('%Y %m %d','now');
 
-select concat(substr(birth_date, 7, 2), '-', substr(birth_date, 4, 2), '-', substr(birth_date, 1, 2)) from users;
-select iif(birth_date is null, 'It is NULL', birth_date) from users;
-select iif(substr(birth_date, 7, 2) > 30, 
-	concat('19', substr(birth_date, 7, 2), '-', substr(birth_date, 4, 2), '-', substr(birth_date, 1, 2)),
-	concat('20', substr(birth_date, 7, 2), '-', substr(birth_date, 4, 2), '-', substr(birth_date, 1, 2))) from users;
+select iif(cast(substr(birth_date, 7, 2) as INTEGER) < 25, 
+	concat('20', substr(birth_date, 7, 2), '-', substr(birth_date, 4, 2), '-', substr(birth_date, 1, 2)),
+	concat('19', substr(birth_date, 7, 2), '-', substr(birth_date, 4, 2), '-', substr(birth_date, 1, 2))) as new_date 
+from users 
+where birth_date is NOT NULL
+order by new_date;
+
+--It has been done
+UPDATE users SET bd_yymmdd = iif(cast(substr(birth_date, 7, 2) as INTEGER) < 25, 
+	concat('20', substr(birth_date, 7, 2), '-', substr(birth_date, 4, 2), '-', substr(birth_date, 1, 2)),
+	concat('19', substr(birth_date, 7, 2), '-', substr(birth_date, 4, 2), '-', substr(birth_date, 1, 2))) 
+	WHERE birth_date is NOT NULL;
 	
-select iif(birth_date is NULL, NULL, iif(substr(birth_date, 7, 2) >=0 and substr(birth_date, 7, 2) < 25, 
+select time, iif(cast(substr(time, 7, 2) as INTEGER) < 25, 
+	concat('20', substr(time, 7, 2), '-', substr(time, 4, 2), '-', substr(time, 1, 2), ' ', substr(time, 10, 5)),
+	concat('19', substr(time, 7, 2), '-', substr(time, 4, 2), '-', substr(time, 1, 2), ' ', substr(time, 10, 5))) as time_new
+from courier_actions 
+where time is NOT NULL
+order by time_new;
+UPDATE courier_actions SET new_time = iif(cast(substr(time, 7, 2) as INTEGER) < 25, 
+	concat('20', substr(time, 7, 2), '-', substr(time, 4, 2), '-', substr(time, 1, 2), ' ', substr(time, 10, 5)),
+	concat('19', substr(time, 7, 2), '-', substr(time, 4, 2), '-', substr(time, 1, 2), ' ', substr(time, 10, 5)));
+	
+select birth_date, iif(cast(substr(birth_date, 7, 2) as INTEGER) < 25, 
 	concat('20', substr(birth_date, 7, 2), '-', substr(birth_date, 4, 2), '-', substr(birth_date, 1, 2)),
-	concat('19', substr(birth_date, 7, 2), '-', substr(birth_date, 4, 2), '-', substr(birth_date, 1, 2)))) from users;
---Does NOT WORK CORRECTLY!!!
-UPDATE users SET bd_yymmdd = iif(birth_date is NULL, NULL, iif(substr(birth_date, 7, 2) >= 0 and substr(birth_date, 7, 2) < 25, 
+	concat('19', substr(birth_date, 7, 2), '-', substr(birth_date, 4, 2), '-', substr(birth_date, 1, 2))) as new_date 
+from couriers 
+where birth_date is NOT NULL
+order by new_date;
+
+UPDATE couriers SET new_birth_date = iif(cast(substr(birth_date, 7, 2) as INTEGER) < 25, 
 	concat('20', substr(birth_date, 7, 2), '-', substr(birth_date, 4, 2), '-', substr(birth_date, 1, 2)),
-	concat('19', substr(birth_date, 7, 2), '-', substr(birth_date, 4, 2), '-', substr(birth_date, 1, 2))));
+	concat('19', substr(birth_date, 7, 2), '-', substr(birth_date, 4, 2), '-', substr(birth_date, 1, 2))) 
+	WHERE birth_date is NOT NULL;
+	
+select creation_time, iif(cast(substr(creation_time, 7, 2) as INTEGER) < 25, 
+	concat('20', substr(creation_time, 7, 2), '-', substr(creation_time, 4, 2), '-', substr(creation_time, 1, 2), ' ', substr(creation_time, 10, 5)),
+	concat('19', substr(creation_time, 7, 2), '-', substr(creation_time, 4, 2), '-', substr(creation_time, 1, 2), ' ', substr(creation_time, 10, 5))) as time_new
+from orders 
+where creation_time is NOT NULL
+order by time_new;
+
+UPDATE orders SET new_time = iif(cast(substr(creation_time, 7, 2) as INTEGER) < 25, 
+	concat('20', substr(creation_time, 7, 2), '-', substr(creation_time, 4, 2), '-', substr(creation_time, 1, 2), ' ', substr(creation_time, 10, 5)),
+	concat('19', substr(creation_time, 7, 2), '-', substr(creation_time, 4, 2), '-', substr(creation_time, 1, 2), ' ', substr(creation_time, 10, 5)));
+	
+select time, iif(cast(substr(time, 7, 2) as INTEGER) < 25, 
+	concat('20', substr(time, 7, 2), '-', substr(time, 4, 2), '-', substr(time, 1, 2), ' ', substr(time, 10, 5)),
+	concat('19', substr(time, 7, 2), '-', substr(time, 4, 2), '-', substr(time, 1, 2), ' ', substr(time, 10, 5))) as time_new
+from user_actions 
+where time is NOT NULL
+order by time_new;
+
+UPDATE user_actions SET new_time = iif(cast(substr(time, 7, 2) as INTEGER) < 25, 
+	concat('20', substr(time, 7, 2), '-', substr(time, 4, 2), '-', substr(time, 1, 2), ' ', substr(time, 10, 5)),
+	concat('19', substr(time, 7, 2), '-', substr(time, 4, 2), '-', substr(time, 1, 2), ' ', substr(time, 10, 5)));
